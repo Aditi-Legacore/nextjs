@@ -1,30 +1,17 @@
 import PostCard from '@/component/PostCard';
 
-import { prisma } from "./utils/db";
-
-async function getPosts() {
-  const latestPosts = await prisma.blogPost.findMany({
-    take: 3, 
-    orderBy: {
-      createdAt: 'desc',
-    },
-    select: {
-      title: true,
-      content: true,
-      imageurl: true,
-      authorimage: true,
-      authorname: true,
-      id: true,
-      createdAt: true,
-    },
-  });
-
-  return latestPosts;
+async function fetchLatestPosts() {
+  const res = await fetch(`${process.env.COMMON_LOCAL_URL}/getlatestpost`);
+  if (!res.ok) {
+    throw new Error('Failed to fetch latest posts');
+  }
+  return res.json();
 }
 
-
 export default async function Home() {
-  var latestPosts = await getPosts()
+  const latestPosts = await fetchLatestPosts();
+  console.log("latestPosts", latestPosts);
+  
   return (
     <div className="font-sans p-8 pb-20 sm:p-20 max-w-7xl mx-auto">
       <h1 className="text-3xl font-bold mb-8">Latest 3 Posts</h1>
